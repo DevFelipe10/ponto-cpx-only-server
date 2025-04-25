@@ -1,18 +1,17 @@
 {
-    "name": "meu-projeto",
-    "version": "1.0.0",
-    "private": true,
-    "workspaces": [
-      "frontend",
-      "backend"
-    ],
-    "scripts": {
-      "build": "npm run build --workspaces",
-      "dev": "concurrently \"npm run dev --workspace=frontend\" \"npm run start --workspace=backend\"",
-      "start": "npm run start --workspace=backend",
-      "deploy": "npm run build"
-    },
-    "devDependencies": {
-      "concurrently": "^8.0.1"
-    }
+  "name": "meu-projeto",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "dev": "concurrently \"npm run dev --workspace=frontend\" \"npm run start --workspace=backend\"",
+    "deploy": "npm run build"
+  },
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "devDependencies": {
+    "concurrently": "^8.0.1"
   }
+}

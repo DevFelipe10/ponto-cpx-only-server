@@ -20,7 +20,7 @@ export default defineConfig(({ mode }) => {
     },
     plugins: [react(), basicSsl()],
     build: {
-      outDir: 'dist',
+      outDir: '../dist/frontend',
     },
     resolve: {
       alias: {
