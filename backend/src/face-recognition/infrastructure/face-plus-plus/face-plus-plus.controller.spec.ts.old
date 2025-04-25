@@ -1,0 +1,18 @@
+import { Test, TestingModule } from '@nestjs/testing'
+import { FacePlusPlusController } from './face-plus-plus.controller'
+
+describe('FacePlusPlusController', () => {
+  let controller: FacePlusPlusController
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      controllers: [FacePlusPlusController],
+    }).compile()
+
+    controller = module.get<FacePlusPlusController>(FacePlusPlusController)
+  })
+
+  it('should be defined', () => {
+    expect(controller).toBeDefined()
+  })
+})

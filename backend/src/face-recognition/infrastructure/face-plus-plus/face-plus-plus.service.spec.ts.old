@@ -1,0 +1,20 @@
+import { Test, TestingModule } from '@nestjs/testing'
+import { FacePlusPlusService } from './face-plus-plus.service'
+import { FacePlusPlusModule } from './face-plus-plus.module'
+
+describe('FacePlusPlusService', () => {
+  let service: FacePlusPlusService
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      imports: [FacePlusPlusModule],
+      providers: [FacePlusPlusService],
+    }).compile()
+
+    service = module.get<FacePlusPlusService>(FacePlusPlusService)
+  })
+
+  it('should be defined', () => {
+    expect(service).toBeDefined()
+  })
+})

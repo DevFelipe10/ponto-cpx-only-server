@@ -1,0 +1,159 @@
+import React, { createContext, useContext, useEffect, useState } from 'react'
+import { AxiosError, HttpStatusCode } from 'axios'
+import { TokenResponse, useApiAuth } from '@/hooks/use-api-auth'
+import api from '@/api'
+
+interface ConfigContextType {
+  configMisterT?: ResultGetConfig
+  progress: number
+  loading: boolean
+  getTokenRegistroPonto: () => Promise<TokenResponse>
+}
+
+type EventoGetSetup = {
+  ID: number
+  IDDM: number
+  IDTIPOPON: number
+  SEQUENCIA: string
+  DESCRICAO: string
+  OBSGER: string
+  SEAPLICARP: string
+  SEAPLICADF: string
+  EXIBENOSRE: string
+  PODEUSAR: string
+}
+
+type FormatoRel = {
+  ID: number
+  IDDM: number
+  SEQUENCIA: string
+  DESCRICAO: string
+  EXDESCRI: string
+  IDFUSOHOR: number
+  EXFUSOHOR: string
+  EXHORVERAO: string
+  IDREGDIA: number
+  EXREGDIA: string
+  HSREGDIA: string
+  IDEVENTO: number
+  EXEVENTO: string
+  HSEVENTO: string
+  IDFATOR: number
+  EXFATOR: string
+  HSFATOR: string
+  IDORIGEM: number
+  EXORIGEM: string
+  HSORIGEM: string
+  IDIPORIGEM: number
+  EXIPORIGEM: string
+  CHAVE: string
+  OBSGER: string
+  PODEUSAR: string
+}
+
+export type ResponseApi<D = undefined> = {
+  status: HttpStatusCode
+  message?: string
+  error?: string
+  data?: D
+}
+
+export type ResultGetConfig = {
+  Success: boolean
+  ErrorMsg: string
+  Versao: string
+  URL_Img_Logo: string
+  FormatoRel: FormatoRel
+  Eventos: EventoGetSetup[]
+}
+
+export type ResultPointRegister = { success: boolean; errormsg: string }
+
+export type MarcacaoMisterT = {
+  Versao: string
+  MATRICULA?: string
+  DATA: string
+  HORA: string
+  FUSOHORAR: string
+  IDEVENTO: number
+  IPORIGEM: string
+  LATITUDE: number
+  LONGITUDE: number
+  PRECISAO: number
+  OBSREG: string
+  IsFacialValid: boolean
+}
+
+const ConfigContext = createContext<ConfigContextType | undefined>(undefined)
+
+export const ConfigProvider = ({ children }: { children: React.ReactNode }) => {
+  const env = import.meta.env
+
+  const { getToken } = useApiAuth()
+
+  const [progress, setProgress] = useState<number>(10)
+  const [loading, setLoading] = useState<boolean>(false)
+  const [configMisterT, setConfigMisterT] = useState<
+    ResultGetConfig | undefined
+  >(undefined)
+  // const { getToken } = useApiAuth()
+
+  const getTokenRegistroPonto = async () =>
+    await getToken(env.VITE_API_USERNAME, env.VITE_API_PASSWORD)
+
+  useEffect(() => {
+    // Set loading como true
+    setLoading(true)
+
+    const getConfgiMisterT = async () => {
+      // Faz o request
+      await api
+        .get<ResponseApi<ResultGetConfig>>(
+          `${env.VITE_API_URL_MISTERT}/config`,
+          {
+            onDownloadProgress: progressEvent => {
+              if (progressEvent.total != undefined) {
+                const percentCompleted = Math.round(
+                  (progressEvent.loaded * 100) / progressEvent.total,
+                )
+
+                setProgress(percentCompleted)
+              }
+            },
+          },
+        )
+        .then(response => {
+          setConfigMisterT(response.data.data!)
+          return response
+        })
+        .catch((err: AxiosError<ResponseApi<ResultGetConfig>>) => err.response!)
+
+      // Set loading como false
+      // setTimeout(() => setLoading(false), 500)
+      setLoading(false)
+    }
+
+    // Executa os requests
+    getTokenRegistroPonto().then(() => {
+      getConfgiMisterT()
+    })
+
+    // setProgress(100)
+    // })
+  }, [env])
+
+  return (
+    <ConfigContext.Provider
+      value={{ configMisterT, progress, loading, getTokenRegistroPonto }}
+    >
+      {children}
+    </ConfigContext.Provider>
+  )
+}
+
+export const useConfig = () => {
+  const context = useContext(ConfigContext)
+  if (!context)
+    throw new Error('useConfig deve ser usado dentro de um ConfigProvider')
+  return context
+}
